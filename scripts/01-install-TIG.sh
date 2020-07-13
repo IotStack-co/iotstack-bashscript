@@ -13,7 +13,7 @@
 #         NOTES:  Not tested on RHEL, CentOS, Fedora
 #        AUTHOR:  Shantanoo Desai, shantanoo.desai@gmail.com, des@biba.uni-bremen.de
 #       COMPANY:  BIBA - Bremer Institut fuer Produktion und Logistik GmbH
-#       VERSION:  0.4
+#       VERSION:  0.5
 #       CREATED:  07/07/20 14:06:48 CEST
 #      REVISION:  ---
 #===============================================================================
@@ -23,10 +23,17 @@ E_NOTROOT=85
 SCRIPTSDIR=`pwd`
 ENVFILE="env.vars"
 
+#===  FUNCTION  ================================================================
+#          NAME:  download_influxdb
+#   DESCRIPTION:  download/install InfluxDB v1.8.0 package on machine based on machine's distribution
+#    PARAMETERS:  none
+#       RETURNS:  none
+#===============================================================================
+
 function download_influxdb () {
 
 	DOWNLOADDIR="/tmp/influxdb"
-	case "$DISTRO" in
+	case $DISTRO in
 	"Debian"|"Ubuntu")
 		echo -e "Downloading Debian Package for InfluxDB v1.8\n"
 		wget --continue -P $DOWNLOADDIR "https://dl.influxdata.com/influxdb/releases/influxdb_1.8.0_amd64.deb"
@@ -70,10 +77,17 @@ function download_influxdb () {
 }
 
 
+#===  FUNCTION  ================================================================
+#          NAME:  download_telegraf
+#   DESCRIPTION:  download/install Telegraf v1.14.5 package on machine based on machine's distribution
+#    PARAMETERS:  none
+#       RETURNS:  none
+#===============================================================================
+
 function download_telegraf () {
 
 	DOWNLOADDIR="/tmp/telegraf"
-	case "$DISTRO" in
+	case $DISTRO in
 	"Debian"|"Ubuntu")
 		echo -e "Downloading Debian Package for Telegraf v1.14-5.1\n"
 		wget --continue -P $DOWNLOADDIR "https://dl.influxdata.com/telegraf/releases/telegraf_1.14.5-1_amd64.deb"
@@ -117,10 +131,16 @@ function download_telegraf () {
 }
 
 
+#===  FUNCTION  ================================================================
+#          NAME:  download_telegraf
+#   DESCRIPTION:  download/install Grafana v7.0.5 package on machine based on machine's distribution
+#    PARAMETERS:  none
+#       RETURNS:  none
+#===============================================================================
 function download_grafana () {
 
 	DOWNLOADDIR="/tmp/grafana"
-	case "$DISTRO" in
+	case $DISTRO in
 	"Debian"|"Ubuntu")
 		echo -e "Downloading Debian Package for Grafana v7.0.5\n"
 		apt-get install -y adduser libfontconfig1
