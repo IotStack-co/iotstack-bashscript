@@ -45,9 +45,6 @@ function determine_distro ()
 
 	elif grep -Eqi "Ubuntu" /etc/issue || grep -Eq "Ubuntu" /etc/*-release ; then
 		DISTRO="Ubuntu"
-	
-	elif grep -Eqi "Raspbian" /etc/issue || grep -Eq "Raspbian" /etc/*-release ; then
-		DISTRO="Raspbian"
 
 	else
 		DISTRO=$(uname -s)
@@ -64,21 +61,6 @@ function determine_distro ()
 #       RETURNS:  none
 #===============================================================================
 
-function install_certbot_auto() {
-	wget --continue -P /tmp/certbot-auto/ "https://dl.eff.org/certbot-auto"
-
-	if [[ -d "/tmp/certbot-auto/" ]]; then
-
-		mv /tmp/certbot-auto /usr/local/bin/certbot-auto
-		chown root /usr/local/bin/certbot-auto
-		chmod 0755 /usr/local/bin/certbot-auto
-	else
-		echo -e "Could not install certbot-auto\n"
-		exit 2
-	fi
-}
-
-
 function install_certbot ()
 {
 	
@@ -91,7 +73,7 @@ function install_certbot ()
 
 	case $DISTRO in
 
-	"CentOS"|"RHEL"|"Fedora")
+	"CentOS"|"RHEL")
 		echo -e "Using yum to install certbot on ${DISTRO} \n"
 		echo -e "Enabling Extra Packages for Enterprise Linux (EPEL)\n"
 		
@@ -106,10 +88,15 @@ function install_certbot ()
 		fi
 	;;
 
-	"Debian"|"Raspbian")
-		echo -e "Using apt to install certbot on ${DISTRO} \n"
+	"Fedora")
+		echo -e "Using dnf to install certbot on ${DISTRO}\n"
+		dnf install certbot
+	;;
 
-		apt install certbot
+	"Debian")
+		echo -e "Using apt-get to install certbot on ${DISTRO} \n"
+
+		apt-get install certbot
 
 		retval=$?
 
@@ -120,15 +107,34 @@ function install_certbot ()
 	;;
 
 	"Ubuntu")
-		echo -e "Adding Repository for Certbot on ${DISTRO}\n"
 
-		add-apt-repository ppa:certbot/certbot
+		source /etc/*-release
 
-		apt update
+		echo -e "Distribution Version: $DISTRIB_RELEASE\n"
 
-		echo -e "Installing Certbot on Ubuntu\n"
+		case $DISTRIB_RELEASE in
+			"19.04"|"20.04")
+				apt-get update
+				apt-get install -y software-properties-common
+				add-apt-repository universe
+				apt-get update
+			;;
 
-		apt install certbot
+			"18.04"|"16.04")
+				apt-get update
+				apt-get install -y software-properties-common
+				add-apt-repository universe
+				add-apt-repository ppa:certbot/certbot
+				apt-get update
+			;;
+
+			*)
+				echo -e "Check Certbot official docs for manual installation on this version.\n"
+			;;
+		esac
+
+		echo -e "Installing Certbot\n"
+		apt-get install certbot
 
 		retval=$?
 
@@ -185,7 +191,7 @@ echo "#-------------------------------------------------------------------------
 echo "#   STEP 1: Checking if certbot exists on machine"
 echo "#-------------------------------------------------------------------------------"
 
-if ! command -v certbot-auto &> /dev/null; then
+if ! command -v certbot &> /dev/null; then
 	echo -e "certbot not installed on machine\n"
 	install_certbot_auto
 else
@@ -244,7 +250,7 @@ echo "#-------------------------------------------------------------------------
 echo "#   STEP 4: Generating SSL Certificates for the Machine using certbot"
 echo "#-------------------------------------------------------------------------------"
 
-/usr/local/bin/certbot-auto certonly \
+certbot certonly \
 	--standalone \
 	--preferred-challenges http \
 	--agree-tos \
