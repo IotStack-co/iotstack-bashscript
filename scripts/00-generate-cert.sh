@@ -193,7 +193,7 @@ echo "#-------------------------------------------------------------------------
 
 if ! command -v certbot &> /dev/null; then
 	echo -e "certbot not installed on machine\n"
-	install_certbot_auto
+	install_certbot
 else
 	echo -e "certbot already exists on machine\n"
 	echo -e "skipping STEP:2 Installing certbot\n"
