@@ -64,6 +64,20 @@ function determine_distro ()
 #       RETURNS:  none
 #===============================================================================
 
+function install_certbot_auto() {
+	wget --continue -P /tmp/certbot-auto/ "https://dl.eff.org/certbot-auto"
+
+	if [[ -d "/tmp/certbot-auto/" ]]; then
+
+		mv /tmp/certbot-auto /usr/local/bin/certbot-auto
+		chown root /usr/local/bin/certbot-auto
+		chmod 0755 /usr/local/bin/certbot-auto
+	else
+		echo -e "Could not install certbot-auto\n"
+		exit 2
+	fi
+}
+
 
 function install_certbot ()
 {
@@ -171,9 +185,9 @@ echo "#-------------------------------------------------------------------------
 echo "#   STEP 1: Checking if certbot exists on machine"
 echo "#-------------------------------------------------------------------------------"
 
-if ! command -v certbot &> /dev/null; then
+if ! command -v certbot-auto &> /dev/null; then
 	echo -e "certbot not installed on machine\n"
-	install_certbot
+	install_certbot_auto
 else
 	echo -e "certbot already exists on machine\n"
 	echo -e "skipping STEP:2 Installing certbot\n"
@@ -230,7 +244,7 @@ echo "#-------------------------------------------------------------------------
 echo "#   STEP 4: Generating SSL Certificates for the Machine using certbot"
 echo "#-------------------------------------------------------------------------------"
 
-certbot certonly \
+/usr/local/bin/certbot-auto certonly \
 	--standalone \
 	--preferred-challenges http \
 	--agree-tos \
