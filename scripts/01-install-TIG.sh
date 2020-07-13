@@ -32,9 +32,9 @@ function download_influxdb () {
 		wget --continue -P $DOWNLOADDIR "https://dl.influxdata.com/influxdb/releases/influxdb_1.8.0_amd64.deb"
 		
 		if [[ -d $DOWNLOADDIR ]]; then
-			if [[ -f $DOWNLOADDIR/influxdb_1.8.0_arm64.deb ]]; then
+			if [[ -f $DOWNLOADDIR/influxdb_1.8.0_amd64.deb ]]; then
 				echo -e "Installing InfluxDB v1.8.0\n"
-				dpkg -i $DOWNLOADDIR/influxdb_1.8.0_arm64.deb
+				dpkg -i $DOWNLOADDIR/influxdb_1.8.0_amd64.deb
 			else
 				echo "Error while Installing InfluxDB. Path to Debian Package not correct."
 			fi
@@ -124,7 +124,7 @@ function download_grafana () {
 	"Debian"|"Ubuntu")
 		echo -e "Downloading Debian Package for Grafana v7.0.5\n"
 		apt-get install -y adduser libfontconfig1
-		wget --continue -P $DOWNLOADDIR " https://dl.grafana.com/oss/release/grafana_7.0.5_amd64.deb"
+		wget --continue -P $DOWNLOADDIR "https://dl.grafana.com/oss/release/grafana_7.0.5_amd64.deb"
 		
 		if [[ -d $DOWNLOADDIR ]]; then
 			if [[ -f $DOWNLOADDIR/grafana_7.0.5_amd64.deb ]]; then
