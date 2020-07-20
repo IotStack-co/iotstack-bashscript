@@ -45,9 +45,6 @@ function determine_distro ()
 
 	elif grep -Eqi "Ubuntu" /etc/issue || grep -Eq "Ubuntu" /etc/*-release ; then
 		DISTRO="Ubuntu"
-	
-	elif grep -Eqi "Raspbian" /etc/issue || grep -Eq "Raspbian" /etc/*-release ; then
-		DISTRO="Raspbian"
 
 	else
 		DISTRO=$(uname -s)
@@ -64,7 +61,6 @@ function determine_distro ()
 #       RETURNS:  none
 #===============================================================================
 
-
 function install_certbot ()
 {
 	
@@ -77,7 +73,7 @@ function install_certbot ()
 
 	case $DISTRO in
 
-	"CentOS"|"RHEL"|"Fedora")
+	"CentOS"|"RHEL")
 		echo -e "Using yum to install certbot on ${DISTRO} \n"
 		echo -e "Enabling Extra Packages for Enterprise Linux (EPEL)\n"
 		
@@ -92,10 +88,15 @@ function install_certbot ()
 		fi
 	;;
 
-	"Debian"|"Raspbian")
-		echo -e "Using apt to install certbot on ${DISTRO} \n"
+	"Fedora")
+		echo -e "Using dnf to install certbot on ${DISTRO}\n"
+		dnf install certbot
+	;;
 
-		apt install certbot
+	"Debian")
+		echo -e "Using apt-get to install certbot on ${DISTRO} \n"
+
+		apt-get install certbot
 
 		retval=$?
 
@@ -106,15 +107,34 @@ function install_certbot ()
 	;;
 
 	"Ubuntu")
-		echo -e "Adding Repository for Certbot on ${DISTRO}\n"
 
-		add-apt-repository ppa:certbot/certbot
+		source /etc/*-release
 
-		apt update
+		echo -e "Distribution Version: $DISTRIB_RELEASE\n"
 
-		echo -e "Installing Certbot on Ubuntu\n"
+		case $DISTRIB_RELEASE in
+			"19.04"|"20.04")
+				apt-get update
+				apt-get install -y software-properties-common
+				add-apt-repository universe
+				apt-get update
+			;;
 
-		apt install certbot
+			"18.04"|"16.04")
+				apt-get update
+				apt-get install -y software-properties-common
+				add-apt-repository universe
+				add-apt-repository ppa:certbot/certbot
+				apt-get update
+			;;
+
+			*)
+				echo -e "Check Certbot official docs for manual installation on this version.\n"
+			;;
+		esac
+
+		echo -e "Installing Certbot\n"
+		apt-get install certbot
 
 		retval=$?
 
